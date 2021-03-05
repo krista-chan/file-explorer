@@ -13,7 +13,6 @@ async function db () {
     await postgres.connect()
     await postgres.query(`CREATE TABLE IF NOT EXISTS users (id VARCHAR(100), name VARCHAR(100))`)
 };db()
-const app = express()
 
 fastify.get('/:id', async (req, res) => {
      if (!req.params || req.params.id) return res.status(400).reply('Incorrect body')
