@@ -22,7 +22,7 @@ fastify.get('/:id', async (req, res) => {
     ]).then(q => res.send(q.rows))
 });
 
-fastify.post('/add', express.json(), async (req, res) => {
+fastify.post('/add', async (req, res) => {
     if (!req.body || req.body.name) return res.status(400).reply('Incorrect body')
     const body = req.body
     const name = body.name
