@@ -1,4 +1,6 @@
-const express = require('express')
+const fastify = require("fastify")({
+  logger: true,
+});
 const {Client: Postgres} = require('pg')
 const {v4: uuid} = require('uuid');
 const postgres = new Postgres({
@@ -13,13 +15,13 @@ async function db () {
 };db()
 const app = express()
 
-app.get('/:id', async (req, res) => {
+fastify.get('/:id', async (req, res) => {
     postgres.query(`SELECT * FROM users WHERE id=$1`, [
         req.params['id']
     ]).then(q => res.send(q.rows))
 });
 
-app.post('/add', express.json(), async (req, res) => {
+fastify.post('/add', express.json(), async (req, res) => {
     const body = req.body
     const name = body.name
     const id = uuid()
@@ -30,4 +32,6 @@ app.post('/add', express.json(), async (req, res) => {
     res.send({id, name})
 })
 
-app.listen(3000)
+fastify.listen(3000, function (err, address) {
+  if (err) throw `Err ${err}`;
+});
