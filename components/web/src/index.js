@@ -16,12 +16,14 @@ async function db () {
 const app = express()
 
 fastify.get('/:id', async (req, res) => {
+     if (!req.params || req.params.id) return res.status(400).reply('Incorrect body')
     postgres.query(`SELECT * FROM users WHERE id=$1`, [
         req.params['id']
     ]).then(q => res.send(q.rows))
 });
 
 fastify.post('/add', express.json(), async (req, res) => {
+    if (!req.body || req.body.name) return res.status(400).reply('Incorrect body')
     const body = req.body
     const name = body.name
     const id = uuid()
