@@ -1,4 +1,6 @@
-const express = require('express')
+const fastify = require("fastify")({
+  logger: true,
+});
 const {Client: Postgres} = require('pg')
 const {v4: uuid} = require('uuid');
 const postgres = new Postgres({
@@ -11,15 +13,16 @@ async function db () {
     await postgres.connect()
     await postgres.query(`CREATE TABLE IF NOT EXISTS users (id VARCHAR(100), name VARCHAR(100))`)
 };db()
-const app = express()
 
-app.get('/:id', async (req, res) => {
+fastify.get('/:id', async (req, res) => {
+     if (!req.params || req.params.id) return res.status(400).reply('Incorrect body')
     postgres.query(`SELECT * FROM users WHERE id=$1`, [
         req.params['id']
     ]).then(q => res.send(q.rows))
 });
 
-app.post('/add', express.json(), async (req, res) => {
+fastify.post('/add', async (req, res) => {
+    if (!req.body || req.body.name) return res.status(400).reply('Incorrect body')
     const body = req.body
     const name = body.name
     const id = uuid()
@@ -30,4 +33,6 @@ app.post('/add', express.json(), async (req, res) => {
     res.send({id, name})
 })
 
-app.listen(3000)
+fastify.listen(3000, function (err, address) {
+  if (err) throw `Err ${err}`;
+});
